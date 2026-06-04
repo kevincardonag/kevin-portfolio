@@ -18,7 +18,7 @@ window.RESUME_DATA = {
   },
 
   summary:
-    'Senior Full Stack Developer with 10+ years of experience building robust web applications with Python, Django, React, and modern AI technologies. Currently working at Monadical, a remote-first software consultancy, building high-impact products including AI agents with LangGraph for organizations like Recidiviz.',
+    'Senior Full Stack Developer with 9+ years of experience building robust web applications with Python, Django, React, and modern AI technologies. Currently working at Monadical, a remote-first software consultancy, building high-impact products including AI agents with LangGraph for organizations.',
 
   // ── Work Experience ────────────────────────────────────────────────────────
   experience: [
@@ -77,7 +77,7 @@ window.RESUME_DATA = {
       url: '',
       role: 'Python Web Developer',
       location: 'Cali, Colombia',
-      startDate: '2016',
+      startDate: '2017',
       endDate: '2018',
       highlights: [
         'Developed TuNotaria — a multi-tenant notary platform with SOAP integrations and payment gateway',
@@ -91,12 +91,12 @@ window.RESUME_DATA = {
 
   // ── Skills ─────────────────────────────────────────────────────────────────
   skills: {
-    'Backend':        { icon: '⚙️', items: ['Python', 'Django', 'FastAPI', 'Flask', 'DRF', 'Celery'] },
-    'Frontend':       { icon: '🎨', items: ['React', 'Vue.js', 'JavaScript', 'TypeScript', 'HTML5', 'CSS3'] },
-    'Databases':      { icon: '🗄️', items: ['PostgreSQL', 'MySQL', 'MongoDB', 'Redis'] },
+    'Backend': { icon: '⚙️', items: ['Python', 'Django', 'FastAPI', 'Flask', 'DRF', 'Celery'] },
+    'Frontend': { icon: '🎨', items: ['React', 'Vue.js', 'JavaScript', 'TypeScript', 'HTML5', 'CSS3'] },
+    'Databases': { icon: '🗄️', items: ['PostgreSQL', 'MySQL', 'MongoDB', 'Redis'] },
     'DevOps & Cloud': { icon: '☁️', items: ['Docker', 'Kubernetes', 'AWS', 'GCP', 'GitHub Actions', 'CI/CD'] },
-    'AI & Automation':{ icon: '🤖', items: ['LangGraph', 'LangSmith', 'LLMs', 'Claude Code', 'AI Agents', 'n8n'] },
-    'Architecture':   { icon: '🏗️', items: ['REST APIs', 'Microservices', 'Multi-tenant', 'SOAP', 'SCRUM'] },
+    'AI & Automation': { icon: '🤖', items: ['LangGraph', 'LangSmith', 'LLMs', 'Claude Code', 'AI Agents', 'n8n'] },
+    'Architecture': { icon: '🏗️', items: ['REST APIs', 'Microservices', 'Multi-tenant', 'SOAP', 'SCRUM'] },
   },
 
   // ── Notable Projects ───────────────────────────────────────────────────────
@@ -109,6 +109,24 @@ window.RESUME_DATA = {
       technologies: ['LangGraph', 'LangSmith', 'FastAPI', 'React', 'GCP', 'Docker'],
       url: 'https://recidiviz.org',
       featured: true,
+    },
+    {
+      name: 'Reflector',
+      company: 'Monadical',
+      description:
+        'Led development of a 100% local ML meeting transcription and analysis platform, implementing audio diarization pipelines and speaker merge tooling.',
+      technologies: ['Python', 'TypeScript', 'Machine Learning', 'Docker'],
+      url: 'https://github.com/GreyhavenHQ/reflector',
+      featured: false,
+    },
+    {
+      name: 'Virtue Poker',
+      company: 'Monadical',
+      description:
+        'Core contributor to decentralized crypto poker platform backend, developing game logic, wallet integrations, and processing 161+ merged pull requests.',
+      technologies: ['Python', 'JavaScript', 'SCSS', 'Web3'],
+      url: 'https://github.com/Monadical-SAS/virtue-poker',
+      featured: false,
     },
     {
       name: 'Sidoc',

@@ -8,32 +8,32 @@
 
   // ── Language Colors ────────────────────────────────────────────────────────
   const LANGUAGE_COLORS = {
-    Python:      '#3572A5',
-    JavaScript:  '#f1e05a',
-    TypeScript:  '#2b7489',
-    HTML:        '#e34c26',
-    CSS:         '#563d7c',
-    Vue:         '#41b883',
-    Shell:       '#89e051',
-    Dockerfile:  '#384d54',
-    Java:        '#b07219',
-    Ruby:        '#701516',
-    Go:          '#00ADD8',
-    Rust:        '#dea584',
-    PHP:         '#4F5D95',
-    C:           '#555555',
-    'C++':       '#f34b7d',
-    'C#':        '#178600',
-    Swift:       '#ffac45',
-    Kotlin:      '#A97BFF',
-    Dart:        '#00B4AB',
-    Jupyter:     '#DA5B0B',
-    Makefile:    '#427819',
-    HCL:         '#844FBA',
-    Nix:         '#7e7eff',
-    Lua:         '#000080',
-    Sass:        '#a53b70',
-    SCSS:        '#c6538c',
+    Python: '#3572A5',
+    JavaScript: '#f1e05a',
+    TypeScript: '#2b7489',
+    HTML: '#e34c26',
+    CSS: '#563d7c',
+    Vue: '#41b883',
+    Shell: '#89e051',
+    Dockerfile: '#384d54',
+    Java: '#b07219',
+    Ruby: '#701516',
+    Go: '#00ADD8',
+    Rust: '#dea584',
+    PHP: '#4F5D95',
+    C: '#555555',
+    'C++': '#f34b7d',
+    'C#': '#178600',
+    Swift: '#ffac45',
+    Kotlin: '#A97BFF',
+    Dart: '#00B4AB',
+    Jupyter: '#DA5B0B',
+    Makefile: '#427819',
+    HCL: '#844FBA',
+    Nix: '#7e7eff',
+    Lua: '#000080',
+    Sass: '#a53b70',
+    SCSS: '#c6538c',
   };
 
   // ── SVG Icons ──────────────────────────────────────────────────────────────
@@ -90,23 +90,9 @@
         // Static file not available, continue
       }
 
-      // 3. Check for personal access token
-      const token = localStorage.getItem('github_pat');
-      let data;
-
-      if (token) {
-        try {
-          data = await this.fetchWithToken(token);
-          console.log('[GitHub] Fetched via GraphQL (with token)');
-        } catch (err) {
-          console.warn('[GitHub] Token fetch failed, falling back to public API:', err);
-          data = await this.fetchFromAPI();
-        }
-      } else {
-        data = await this.fetchFromAPI();
-        console.log('[GitHub] Fetched via public REST API');
-      }
-
+      // 3. Fallback to public REST API
+      console.log('[GitHub] Fetching from public REST API...');
+      const data = await this.fetchFromAPI();
       if (data) {
         this.setCache(data);
       }
@@ -183,121 +169,6 @@
       };
     },
 
-    // ── GraphQL API (with token) ───────────────────────────────────────────
-    async fetchWithToken(token) {
-      const query = `
-        query {
-          user(login: "${this.username}") {
-            login
-            name
-            avatarUrl
-            bio
-            location
-            websiteUrl
-            createdAt
-            repositories(first: 20, orderBy: {field: UPDATED_AT, direction: DESC}, privacy: PUBLIC) {
-              totalCount
-              nodes {
-                name
-                description
-                url
-                primaryLanguage { name color }
-                stargazerCount
-                forkCount
-                updatedAt
-                isPrivate
-                isFork
-              }
-            }
-            contributionsCollection {
-              totalCommitContributions
-              totalPullRequestContributions
-              totalPullRequestReviewContributions
-              totalIssueContributions
-              restrictedContributionsCount
-              contributionCalendar {
-                totalContributions
-                weeks {
-                  contributionDays {
-                    contributionCount
-                    date
-                    color
-                  }
-                }
-              }
-            }
-            followers { totalCount }
-            following { totalCount }
-            privateRepos: repositories(privacy: PRIVATE) { totalCount }
-          }
-        }
-      `;
-
-      const res = await fetch('https://api.github.com/graphql', {
-        method: 'POST',
-        headers: {
-          Authorization: `bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ query }),
-      });
-
-      if (!res.ok) {
-        throw new Error(`GraphQL error: ${res.status}`);
-      }
-
-      const json = await res.json();
-      if (json.errors) {
-        throw new Error(json.errors[0].message);
-      }
-
-      const user = json.data.user;
-      const contrib = user.contributionsCollection;
-      const calendar = contrib.contributionCalendar;
-      const createdAt = new Date(user.createdAt);
-      const yearsOnGitHub = new Date().getFullYear() - createdAt.getFullYear();
-
-      return {
-        timestamp: new Date().toISOString(),
-        profile: {
-          login: user.login,
-          name: user.name,
-          avatarUrl: user.avatarUrl,
-          bio: user.bio,
-          location: user.location,
-          blog: user.websiteUrl,
-          createdAt: user.createdAt,
-        },
-        repos: user.repositories.nodes.map((r) => ({
-          name: r.name,
-          description: r.description,
-          url: r.url,
-          primaryLanguage: r.primaryLanguage,
-          stargazerCount: r.stargazerCount,
-          forkCount: r.forkCount,
-          updatedAt: r.updatedAt,
-          isPrivate: r.isPrivate,
-          isFork: r.isFork,
-        })),
-        contributions: {
-          totalCommitContributions: contrib.totalCommitContributions,
-          totalPullRequestContributions: contrib.totalPullRequestContributions,
-          totalPullRequestReviewContributions: contrib.totalPullRequestReviewContributions,
-          totalIssueContributions: contrib.totalIssueContributions,
-          restrictedContributionsCount: contrib.restrictedContributionsCount,
-          contributionCalendar: calendar,
-        },
-        stats: {
-          publicRepos: user.repositories.totalCount,
-          privateRepos: user.privateRepos.totalCount,
-          totalContributions: calendar.totalContributions,
-          totalCommits: contrib.totalCommitContributions,
-          followers: user.followers.totalCount,
-          following: user.following.totalCount,
-          yearsOnGitHub,
-        },
-      };
-    },
 
     // ── Render Stats ───────────────────────────────────────────────────────
     renderStats(data) {
@@ -305,21 +176,19 @@
       if (!container || !data.stats) return;
 
       const stats = data.stats;
+      const contrib = data.contributions || {};
+      const totalRepos = (stats.publicRepos ?? 0) + (stats.privateRepos ?? 0);
+
       const items = [
         {
-          label: 'Public Repos',
-          value: stats.publicRepos ?? '—',
-          extra: stats.privateRepos ? `+${stats.privateRepos} private` : null,
+          label: 'Total Repos',
+          value: totalRepos || stats.publicRepos || '—',
+          extra: stats.privateRepos ? `${stats.publicRepos} public · ${stats.privateRepos} private` : null,
         },
         {
           label: 'Contributions',
           value: stats.totalContributions ?? stats.totalCommits ?? '—',
           extra: stats.totalContributions ? 'this year' : 'recent',
-        },
-        {
-          label: 'Followers',
-          value: stats.followers ?? '—',
-          extra: null,
         },
         {
           label: 'Years on GitHub',
@@ -346,53 +215,90 @@
       const container = document.getElementById('github-repos');
       if (!container) return;
 
-      // Filter out forks, show up to 6
-      const displayRepos = repos
-        .filter((r) => !r.isFork)
-        .slice(0, 6);
+      // Filter out forks
+      const allRepos = repos.filter((r) => !r.isFork);
+      const INITIAL_COUNT = 9;
 
-      if (displayRepos.length === 0) {
+      if (allRepos.length === 0) {
         container.innerHTML = '<p class="no-data">No repositories to display.</p>';
         return;
       }
 
-      container.innerHTML = displayRepos
-        .map(
-          (repo) => `
+      const renderRepoCard = (repo) => {
+        // Build language dots — use multi-language array if available, else fallback to primaryLanguage
+        let languageHTML = '';
+        if (repo.languages && repo.languages.length > 0) {
+          languageHTML = repo.languages
+            .map((lang) => `<span class="repo-language">
+              <span class="repo-language-dot" style="background: ${lang.color || '#8b949e'}"></span>
+              ${this.escapeHtml(lang.name)}
+            </span>`)
+            .join('');
+        } else if (repo.primaryLanguage) {
+          languageHTML = `<span class="repo-language">
+            <span class="repo-language-dot" style="background: ${repo.primaryLanguage.color || '#8b949e'}"></span>
+            ${this.escapeHtml(repo.primaryLanguage.name)}
+          </span>`;
+        }
+
+        return `
         <div class="repo-card glass-card">
           <div class="repo-header">
             <span class="repo-icon">${ICONS.repo}</span>
-            <a href="${repo.url}" target="_blank" rel="noopener noreferrer" class="repo-name">
-              ${this.escapeHtml(repo.name)}
-            </a>
+            ${repo.isPrivate
+            ? `<span class="repo-name">${this.escapeHtml(repo.name)}<span class="repo-private-badge">🔒 Private</span></span>`
+            : `<a href="${repo.url}" target="_blank" rel="noopener noreferrer" class="repo-name">${this.escapeHtml(repo.name)}</a>`
+          }
           </div>
           <p class="repo-description">
             ${repo.description ? this.escapeHtml(repo.description) : '<span class="text-muted">No description provided</span>'}
           </p>
           <div class="repo-footer">
-            ${
-              repo.primaryLanguage
-                ? `<span class="repo-language">
-                    <span class="repo-language-dot" style="background: ${repo.primaryLanguage.color || '#8b949e'}"></span>
-                    ${this.escapeHtml(repo.primaryLanguage.name)}
-                  </span>`
-                : ''
-            }
-            ${
-              repo.stargazerCount > 0
-                ? `<span class="repo-stat">${ICONS.star} ${this.formatNumber(repo.stargazerCount)}</span>`
-                : ''
-            }
-            ${
-              repo.forkCount > 0
-                ? `<span class="repo-stat">${ICONS.fork} ${this.formatNumber(repo.forkCount)}</span>`
-                : ''
-            }
+            ${languageHTML}
+            ${repo.stargazerCount > 0
+            ? `<span class="repo-stat">${ICONS.star} ${this.formatNumber(repo.stargazerCount)}</span>`
+            : ''
+          }
+            ${repo.forkCount > 0
+            ? `<span class="repo-stat">${ICONS.fork} ${this.formatNumber(repo.forkCount)}</span>`
+            : ''
+          }
           </div>
         </div>
-      `
-        )
-        .join('');
+      `;
+      };
+
+      // Render initial set
+      const initialRepos = allRepos.slice(0, INITIAL_COUNT);
+      const remainingRepos = allRepos.slice(INITIAL_COUNT);
+
+      let html = initialRepos.map(renderRepoCard).join('');
+
+      // Add hidden remaining repos + toggle button
+      if (remainingRepos.length > 0) {
+        html += `<div class="repo-remaining" id="repo-remaining" style="display: none;">
+          ${remainingRepos.map(renderRepoCard).join('')}
+        </div>`;
+        html += `<div class="repo-toggle-wrapper">
+          <button class="btn btn-secondary btn-sm repo-toggle-btn" id="repo-toggle-btn">
+            Show All (${allRepos.length})
+          </button>
+        </div>`;
+      }
+
+      container.innerHTML = html;
+
+      // Attach toggle event
+      const toggleBtn = document.getElementById('repo-toggle-btn');
+      const remaining = document.getElementById('repo-remaining');
+      if (toggleBtn && remaining) {
+        let expanded = false;
+        toggleBtn.addEventListener('click', () => {
+          expanded = !expanded;
+          remaining.style.display = expanded ? 'contents' : 'none';
+          toggleBtn.textContent = expanded ? 'Show Less' : `Show All (${allRepos.length})`;
+        });
+      }
     },
 
     // ── Render Contribution Graph ──────────────────────────────────────────

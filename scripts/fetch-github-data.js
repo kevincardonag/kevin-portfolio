@@ -14,9 +14,36 @@ const path = require('path');
 
 // ── Configuration ────────────────────────────────────────────────────────────
 const USERNAME = 'kevincardonag';
-const TOKEN = process.env.GITHUB_TOKEN || '';
 const OUTPUT_DIR = path.resolve(__dirname, '..', 'data');
 const OUTPUT_FILE = path.join(OUTPUT_DIR, 'github-data.json');
+
+// Attempt to read the token from local files (.token or .env) to keep it safe from shell history
+let envToken = '';
+try {
+  const tokenFile = path.resolve(__dirname, '..', '.token');
+  if (fs.existsSync(tokenFile)) {
+    envToken = fs.readFileSync(tokenFile, 'utf8').trim();
+    console.log('🔑 Loaded token from local .token file.');
+  } else {
+    const envFile = path.resolve(__dirname, '..', '.env');
+    if (fs.existsSync(envFile)) {
+      const envContent = fs.readFileSync(envFile, 'utf8');
+      const lines = envContent.split(/\r?\n/);
+      for (const line of lines) {
+        const match = line.match(/^\s*GITHUB_TOKEN\s*=\s*(["']?)(.*?)\1\s*$/);
+        if (match) {
+          envToken = match[2].trim();
+          console.log('🔑 Loaded GITHUB_TOKEN from local .env file.');
+          break;
+        }
+      }
+    }
+  }
+} catch (err) {
+  console.warn('⚠️  Could not read local token file:', err.message);
+}
+
+const TOKEN = process.env.GITHUB_TOKEN || envToken || '';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -55,13 +82,13 @@ function httpsRequest(options, body = null) {
 /**
  * Fetch from GitHub REST API.
  */
-function fetchREST(endpoint) {
+function fetchREST(endpoint, useToken = true) {
   const headers = {
     'User-Agent': 'kevin-portfolio-fetcher',
     Accept: 'application/vnd.github.v3+json',
   };
 
-  if (TOKEN) {
+  if (TOKEN && useToken) {
     headers.Authorization = `token ${TOKEN}`;
   }
 
@@ -113,13 +140,19 @@ async function fetchWithGraphQL() {
         location
         websiteUrl
         createdAt
-        repositories(first: 20, orderBy: {field: UPDATED_AT, direction: DESC}, privacy: PUBLIC) {
+        repositories(first: 30, orderBy: {field: UPDATED_AT, direction: DESC}) {
           totalCount
           nodes {
             name
             description
             url
             primaryLanguage { name color }
+            languages(first: 5, orderBy: {field: SIZE, direction: DESC}) {
+              edges {
+                size
+                node { name color }
+              }
+            }
             stargazerCount
             forkCount
             updatedAt
@@ -179,6 +212,11 @@ async function fetchWithGraphQL() {
       description: r.description,
       url: r.url,
       primaryLanguage: r.primaryLanguage,
+      languages: r.languages.edges.map((e) => ({
+        name: e.node.name,
+        color: e.node.color,
+        size: e.size,
+      })),
       stargazerCount: r.stargazerCount,
       forkCount: r.forkCount,
       updatedAt: r.updatedAt,
@@ -208,13 +246,13 @@ async function fetchWithGraphQL() {
 /**
  * Fetch data via public REST API (no token needed).
  */
-async function fetchWithREST() {
-  console.log('📡 Fetching via public REST API...');
+async function fetchWithREST(useToken = true) {
+  console.log(`📡 Fetching via public REST API (using token: ${useToken && !!TOKEN})...`);
 
   const [profile, repos, events] = await Promise.all([
-    fetchREST(`/users/${USERNAME}`),
-    fetchREST(`/users/${USERNAME}/repos?sort=updated&per_page=20&type=all`),
-    fetchREST(`/users/${USERNAME}/events/public?per_page=100`),
+    fetchREST(`/users/${USERNAME}`, useToken),
+    fetchREST(`/users/${USERNAME}/repos?sort=updated&per_page=20&type=all`, useToken),
+    fetchREST(`/users/${USERNAME}/events/public?per_page=100`, useToken),
   ]);
 
   // Estimate contributions from recent push events
@@ -280,9 +318,10 @@ async function main() {
   console.log('');
 
   if (!TOKEN) {
-    console.log('⚠️  No GITHUB_TOKEN found in environment.');
+    console.log('⚠️  No GitHub token found in environment or local files.');
     console.log('   Private repo stats and contribution graph will not be available.');
-    console.log('   Usage: GITHUB_TOKEN=ghp_xxx node scripts/fetch-github-data.js');
+    console.log('   To provide a token safely, create a file named `.token` at the root');
+    console.log('   of your project and paste your Personal Access Token (PAT) inside.');
     console.log('');
   }
 
@@ -292,16 +331,16 @@ async function main() {
     if (TOKEN) {
       data = await fetchWithGraphQL();
     } else {
-      data = await fetchWithREST();
+      data = await fetchWithREST(false);
     }
   } catch (err) {
     console.error('❌ Fetch failed:', err.message);
 
-    // If GraphQL fails, try REST as fallback
+    // If GraphQL fails, try REST as fallback (without token in case token is expired/invalid)
     if (TOKEN) {
-      console.log('\n🔄 Falling back to REST API...');
+      console.log('\n🔄 Falling back to public REST API (without token)...');
       try {
-        data = await fetchWithREST();
+        data = await fetchWithREST(false);
       } catch (restErr) {
         console.error('❌ REST API also failed:', restErr.message);
         process.exit(1);

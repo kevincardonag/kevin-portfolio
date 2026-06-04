@@ -215,45 +215,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   statNumbers.forEach((el) => counterObserver.observe(el));
 
-  // ── 10. Resume Download ───────────────────────────────────────────────────
-  function handleResumeDownload(e) {
-    e.preventDefault();
-
-    // Try to download a PDF if available, otherwise use print
-    const pdfPath = 'assets/kevin-resume.pdf';
-
-    fetch(pdfPath, { method: 'HEAD' })
-      .then((res) => {
-        if (res.ok) {
-          const link = document.createElement('a');
-          link.href = pdfPath;
-          link.download = 'Kevin_Cardona_Resume.pdf';
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-        } else {
-          window.print();
-        }
-      })
-      .catch(() => {
-        window.print();
-      });
-  }
-
-  const downloadBtns = [
-    document.getElementById('download-resume'),
-    document.getElementById('download-resume-hero'),
-  ];
-
-  downloadBtns.forEach((btn) => {
-    if (btn) btn.addEventListener('click', handleResumeDownload);
-  });
 
   // ── 11. Background Canvas Animation (Particles) ──────────────────────────
   initParticleCanvas();
 
-  // ── 12. GitHub Config Modal ───────────────────────────────────────────────
-  initGitHubConfigModal();
 
   // ── 13. Initialize GitHub Integration ─────────────────────────────────────
   if (window.GitHubIntegration) {
@@ -384,87 +349,4 @@ function initParticleCanvas() {
   animationId = requestAnimationFrame(animate);
 }
 
-// =============================================================================
-// GitHub Config Modal — token management
-// =============================================================================
-function initGitHubConfigModal() {
-  const configBtn   = document.getElementById('github-config-btn');
-  const modal       = document.getElementById('github-config-modal');
-  const closeBtn    = document.getElementById('github-config-close');
-  const saveBtn     = document.getElementById('github-token-save');
-  const clearBtn    = document.getElementById('github-token-clear');
-  const tokenInput  = document.getElementById('github-token-input');
 
-  if (!modal) return;
-
-  function openModal() {
-    modal.classList.add('active');
-    // Pre-fill if token exists
-    if (tokenInput) {
-      const existing = localStorage.getItem('github_pat');
-      if (existing) {
-        tokenInput.value = existing.substring(0, 8) + '••••••••••••';
-        tokenInput.dataset.hasToken = 'true';
-      } else {
-        tokenInput.value = '';
-        tokenInput.dataset.hasToken = 'false';
-      }
-    }
-  }
-
-  function closeModal() {
-    modal.classList.remove('active');
-  }
-
-  if (configBtn) configBtn.addEventListener('click', openModal);
-  if (closeBtn) closeBtn.addEventListener('click', closeModal);
-
-  if (saveBtn) {
-    saveBtn.addEventListener('click', () => {
-      if (!tokenInput) return;
-
-      const token = tokenInput.value.trim();
-      // Don't save the masked version
-      if (token && !token.includes('••••')) {
-        localStorage.setItem('github_pat', token);
-      }
-
-      closeModal();
-
-      // Reload GitHub data with new token
-      if (window.GitHubIntegration) {
-        // Clear cache so we re-fetch with token
-        localStorage.removeItem(window.GitHubIntegration.cacheKey);
-        window.GitHubIntegration.init();
-      }
-    });
-  }
-
-  if (clearBtn) {
-    clearBtn.addEventListener('click', () => {
-      localStorage.removeItem('github_pat');
-      if (tokenInput) tokenInput.value = '';
-      closeModal();
-
-      // Reload GitHub data without token
-      if (window.GitHubIntegration) {
-        localStorage.removeItem(window.GitHubIntegration.cacheKey);
-        window.GitHubIntegration.init();
-      }
-    });
-  }
-
-  // Click outside modal content to close
-  modal.addEventListener('click', (e) => {
-    if (e.target === modal) {
-      closeModal();
-    }
-  });
-
-  // Escape key to close
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && modal.classList.contains('active')) {
-      closeModal();
-    }
-  });
-}
