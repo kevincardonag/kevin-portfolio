@@ -50,22 +50,34 @@
     cacheTTL: 3600000, // 1 hour in ms
 
     // ── Init ───────────────────────────────────────────────────────────────
+    _lastData: null,
+
     async init() {
       this.showLoading();
 
       try {
         const data = await this.fetchData();
         if (data) {
+          this._lastData = data;
           this.renderStats(data);
           this.renderRepos(data.repos || []);
           this.renderContributionGraph(data);
         }
       } catch (err) {
         console.error('[GitHub] Init failed:', err);
-        this.showError('Unable to load GitHub data. Please try again later.');
+        this.showError(this._t('github.error', 'Unable to load GitHub data. Please try again later.'));
       } finally {
         this.hideLoading();
       }
+    },
+
+    // ── i18n helper — get translated string or fallback ───────────────────
+    _t(key, fallback) {
+      if (window.I18n && typeof window.I18n.t === 'function') {
+        const val = window.I18n.t(key);
+        return (val && val !== key) ? val : fallback;
+      }
+      return fallback;
     },
 
     // ── Data Fetching Strategy ─────────────────────────────────────────────
@@ -181,17 +193,17 @@
 
       const items = [
         {
-          label: 'Total Repos',
+          label: this._t('github.totalRepos', 'Total Repos'),
           value: totalRepos || stats.publicRepos || '—',
           extra: stats.privateRepos ? `${stats.publicRepos} public · ${stats.privateRepos} private` : null,
         },
         {
-          label: 'Contributions',
+          label: this._t('github.contributions', 'Contributions'),
           value: stats.totalContributions ?? stats.totalCommits ?? '—',
-          extra: stats.totalContributions ? 'this year' : 'recent',
+          extra: stats.totalContributions ? this._t('github.thisYear', 'this year') : this._t('github.recent', 'recent'),
         },
         {
-          label: 'Years on GitHub',
+          label: this._t('github.yearsOnGithub', 'Years on GitHub'),
           value: stats.yearsOnGitHub ?? '—',
           extra: null,
         },
@@ -220,7 +232,7 @@
       const INITIAL_COUNT = 9;
 
       if (allRepos.length === 0) {
-        container.innerHTML = '<p class="no-data">No repositories to display.</p>';
+        container.innerHTML = `<p class="no-data">${this._t('github.noRepos', 'No repositories to display.')}</p>`;
         return;
       }
 
@@ -251,7 +263,7 @@
           }
           </div>
           <p class="repo-description">
-            ${repo.description ? this.escapeHtml(repo.description) : '<span class="text-muted">No description provided</span>'}
+            ${repo.description ? this.escapeHtml(repo.description) : `<span class="text-muted">${this._t('github.noDescription', 'No description provided')}</span>`}
           </p>
           <div class="repo-footer">
             ${languageHTML}
@@ -281,7 +293,7 @@
         </div>`;
         html += `<div class="repo-toggle-wrapper">
           <button class="btn btn-secondary btn-sm repo-toggle-btn" id="repo-toggle-btn">
-            Show All (${allRepos.length})
+            ${this._t('github.showAll', 'Show All')} (${allRepos.length})
           </button>
         </div>`;
       }
@@ -296,7 +308,9 @@
         toggleBtn.addEventListener('click', () => {
           expanded = !expanded;
           remaining.style.display = expanded ? 'contents' : 'none';
-          toggleBtn.textContent = expanded ? 'Show Less' : `Show All (${allRepos.length})`;
+          toggleBtn.textContent = expanded
+            ? this._t('github.showLess', 'Show Less')
+            : `${this._t('github.showAll', 'Show All')} (${allRepos.length})`;
         });
       }
     },
@@ -323,15 +337,15 @@
         <div class="contribution-graph">
           <div class="contribution-grid" id="contribution-grid"></div>
           <div class="contribution-legend">
-            <span class="contribution-legend-label">Less</span>
+            <span class="contribution-legend-label">${this._t('github.less', 'Less')}</span>
             <span class="contribution-cell" style="opacity: 0.1"></span>
             <span class="contribution-cell" style="opacity: 0.3"></span>
             <span class="contribution-cell" style="opacity: 0.55"></span>
             <span class="contribution-cell" style="opacity: 0.8"></span>
             <span class="contribution-cell" style="opacity: 1"></span>
-            <span class="contribution-legend-label">More</span>
+            <span class="contribution-legend-label">${this._t('github.more', 'More')}</span>
           </div>
-          <p class="contribution-total">${this.formatNumber(calendar.totalContributions)} contributions in the last year</p>
+          <p class="contribution-total">${this.formatNumber(calendar.totalContributions)} ${this._t('github.contributionsYear', 'contributions in the last year')}</p>
         </div>
       `;
 
@@ -363,15 +377,15 @@
         <div class="contribution-graph">
           <div class="contribution-grid" id="contribution-grid"></div>
           <div class="contribution-legend">
-            <span class="contribution-legend-label">Less</span>
+            <span class="contribution-legend-label">${this._t('github.less', 'Less')}</span>
             <span class="contribution-cell" style="opacity: 0.1"></span>
             <span class="contribution-cell" style="opacity: 0.3"></span>
             <span class="contribution-cell" style="opacity: 0.55"></span>
             <span class="contribution-cell" style="opacity: 0.8"></span>
             <span class="contribution-cell" style="opacity: 1"></span>
-            <span class="contribution-legend-label">More</span>
+            <span class="contribution-legend-label">${this._t('github.more', 'More')}</span>
           </div>
-          <p class="contribution-note">Add a GitHub token to see your real contribution graph</p>
+          <p class="contribution-note">${this._t('github.contributionNote', 'Add a GitHub token to see your real contribution graph')}</p>
         </div>
       `;
 
@@ -445,8 +459,8 @@
       if (errorEl) {
         errorEl.hidden = false;
         errorEl.innerHTML = `
-          <p>${this.escapeHtml(message)} <a href="https://github.com/kevincardonag" target="_blank">Visit my profile →</a></p>
-          <button class="btn btn-secondary btn-sm" onclick="window.GitHubIntegration.init()">Retry</button>
+          <p>${this.escapeHtml(message)} <a href="https://github.com/kevincardonag" target="_blank">${this._t('github.errorLink', 'Visit my profile →')}</a></p>
+          <button class="btn btn-secondary btn-sm" onclick="window.GitHubIntegration.init()">${this._t('github.retry', 'Retry')}</button>
         `;
       }
     },

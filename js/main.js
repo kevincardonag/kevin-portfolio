@@ -121,7 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
   revealElements.forEach((el) => revealObserver.observe(el));
 
   // ── 8. Typing Animation ───────────────────────────────────────────────────
-  const TYPING_WORDS = [
+  let typingWords = [
     'robust web applications',
     'scalable APIs',
     'AI-powered solutions',
@@ -135,11 +135,12 @@ document.addEventListener('DOMContentLoaded', () => {
   let wordIndex = 0;
   let charIndex = 0;
   let isDeleting = false;
+  let typingTimer = null;
 
   function typeLoop() {
     if (!typingText) return;
 
-    const currentWord = TYPING_WORDS[wordIndex];
+    const currentWord = typingWords[wordIndex];
 
     if (!isDeleting) {
       // Typing forward
@@ -149,10 +150,10 @@ document.addEventListener('DOMContentLoaded', () => {
       if (charIndex === currentWord.length) {
         // Full word typed — pause then start deleting
         isDeleting = true;
-        setTimeout(typeLoop, PAUSE_AFTER);
+        typingTimer = setTimeout(typeLoop, PAUSE_AFTER);
         return;
       }
-      setTimeout(typeLoop, TYPE_SPEED);
+      typingTimer = setTimeout(typeLoop, TYPE_SPEED);
     } else {
       // Deleting backward
       charIndex--;
@@ -161,13 +162,30 @@ document.addEventListener('DOMContentLoaded', () => {
       if (charIndex === 0) {
         // Fully deleted — move to next word
         isDeleting = false;
-        wordIndex = (wordIndex + 1) % TYPING_WORDS.length;
-        setTimeout(typeLoop, PAUSE_BEFORE);
+        wordIndex = (wordIndex + 1) % typingWords.length;
+        typingTimer = setTimeout(typeLoop, PAUSE_BEFORE);
         return;
       }
-      setTimeout(typeLoop, DELETE_SPEED);
+      typingTimer = setTimeout(typeLoop, DELETE_SPEED);
     }
   }
+
+  // Expose typing animation for i18n language switching
+  window.TypingAnimation = {
+    updateWords(newWords) {
+      if (!Array.isArray(newWords) || newWords.length === 0) return;
+      // Stop current animation
+      if (typingTimer) clearTimeout(typingTimer);
+      // Reset state
+      typingWords = newWords;
+      wordIndex = 0;
+      charIndex = 0;
+      isDeleting = false;
+      if (typingText) typingText.textContent = '';
+      // Restart
+      typeLoop();
+    },
+  };
 
   typeLoop();
 
@@ -223,6 +241,11 @@ document.addEventListener('DOMContentLoaded', () => {
   // ── 13. Initialize GitHub Integration ─────────────────────────────────────
   if (window.GitHubIntegration) {
     window.GitHubIntegration.init();
+  }
+
+  // ── 14. Initialize i18n ───────────────────────────────────────────────────
+  if (window.I18n) {
+    window.I18n.init();
   }
 });
 

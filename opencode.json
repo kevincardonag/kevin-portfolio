@@ -1,0 +1,6 @@
+{
+    "provider": "openai",
+    "base_url": "https://litellm.app.monadical.io/v1",
+    "api_key": "sk-r8k8jarKM_MKlNcfrO4_Aw",
+    "model": "monadical/smart"
+}

@@ -1,0 +1,172 @@
+{
+  "meta": {
+    "title": "Kevin Cardona | Senior Full Stack Python Developer",
+    "description": "Portfolio of Kevin Cardona — Senior Full Stack Python Developer with 9+ years of experience in Python, Django, React, FastAPI, and AI/ML technologies.",
+    "ogTitle": "Kevin Cardona | Senior Full Stack Python Developer",
+    "ogDescription": "Portfolio of Kevin Cardona — Senior Full Stack Python Developer with 9+ years of experience in Python, Django, React, FastAPI, and AI/ML technologies.",
+    "twitterTitle": "Kevin Cardona | Senior Full Stack Python Developer",
+    "twitterDescription": "Portfolio of Kevin Cardona — Senior Full Stack Python Developer with 9+ years of experience in Python, Django, React, FastAPI, and AI/ML technologies."
+  },
+
+  "nav": {
+    "about": "About",
+    "experience": "Experience",
+    "skills": "Skills",
+    "projects": "Projects",
+    "github": "GitHub",
+    "contact": "Contact"
+  },
+
+  "hero": {
+    "greeting": "Hi, my name is",
+    "description": "Senior Full Stack Developer with 9+ years of experience crafting robust web applications. Specialized in Python, Django, React, and modern AI technologies. Currently building impactful software at",
+    "descriptionLink": "Monadical",
+    "cta_work": "View My Work",
+    "cta_contact": "Contact Me",
+    "typingWords": [
+      "robust web applications",
+      "scalable APIs",
+      "AI-powered solutions",
+      "full-stack systems"
+    ]
+  },
+
+  "about": {
+    "sectionTitle": "About Me",
+    "p1": "I'm a passionate Full Stack Developer with over a decade of experience building web applications that solve real-world problems. My journey started in 2014 with PHP and Python, and since then I've evolved through every wave of web technology, from jQuery to modern frameworks like React and Vue.js.",
+    "p2_prefix": "Currently, I work as a Senior Full Stack Python Developer at",
+    "p2_link": "Monadical",
+    "p2_suffix": ", a remote-first software consultancy where I build high-impact products for clients.",
+    "p3": "I'm deeply invested in the AI revolution, I've built production AI agents using LangGraph and LangSmith, and I leverage tools like Claude Code daily to amplify my development workflow. I believe the best developers combine deep technical expertise with the ability to harness AI as a force multiplier.",
+    "statYears": "Years Experience",
+    "statProjects": "Projects Delivered",
+    "statRemote": "Years Remote International",
+    "statCompanies": "Companies"
+  },
+
+  "experience": {
+    "sectionTitle": "Where I've Worked",
+    "monadical": {
+      "date": "2021 — Present",
+      "title": "Senior Full Stack Python Developer",
+      "location": "Remote — Montréal / Medellín / NYC",
+      "li1": "Architected and developed full-stack web applications for international clients using Python, FastAPI, React, NextJS, and PostgreSQL",
+      "li2_prefix": "Built an AI-powered agent using LangGraph and LangSmith for",
+      "li2_link": "Recidiviz",
+      "li2_suffix": ", a non-profit transforming criminal justice through data-driven technology",
+      "li3": "Designed and implemented workflow automation systems using n8n, reducing manual processes significantly",
+      "li4": "Deployed and managed containerized applications on Google Cloud Platform using Docker",
+      "li5": "Collaborated with distributed teams across multiple time zones in a fully remote, async-first environment",
+      "li6": "Leveraged AI development tools (Claude Code, LLMs) to enhance productivity and code quality"
+    },
+    "swapps": {
+      "date": "2020 — 2021",
+      "title": "Backend Developer",
+      "li1": "Developed enterprise-grade web applications using Django 3.2, Vue.js, and Django REST Framework",
+      "li2": "Built Sidoc, an enterprise system with SIESA ERP integration using Celery for async task processing",
+      "li3": "Implemented Fillweight, a logistics management platform with real-time data processing",
+      "li4": "Designed RESTful APIs following best practices for scalability and maintainability"
+    },
+    "millenium": {
+      "date": "2018 — 2020",
+      "title": "Web Developer",
+      "li1": "Built Buuson, a full-stack platform with microservices architecture using Python, Django, and Tornado",
+      "li2": "Integrated AWS services, OwnCloud file management, and PayU payment gateway",
+      "li3": "Developed RESTful APIs and Google Maps integrations for location-based features",
+      "li4": "Worked in agile (SCRUM) methodology delivering iterative releases"
+    },
+    "rady": {
+      "date": "2017 — 2018",
+      "title": "Python Web Developer",
+      "li1": "Developed TuNotaria, a multi-tenant notary platform with SOAP integrations and payment gateway",
+      "li2": "Built MyRightHand with Google Maps API integration for geolocation services",
+      "li3": "Created Vitocsa with SIESA ERP system integration for business process automation",
+      "li4": "Delivered 4+ projects using Python, Django, and REST Framework"
+    }
+  },
+
+  "skills": {
+    "sectionTitle": "Skills & Technologies",
+    "backend": "Backend",
+    "frontend": "Frontend",
+    "databases": "Databases",
+    "devops": "DevOps & Cloud",
+    "ai": "AI & Automation",
+    "architecture": "Architecture",
+    "testing": "Testing & QA",
+    "aiEcosystem": "AI Ecosystem"
+  },
+
+  "projects": {
+    "sectionTitle": "Featured Projects",
+    "featuredLabel": "Featured",
+    "recidiviz": {
+      "title": "Recidiviz AI Agent",
+      "company": "Monadical (for Recidiviz)",
+      "description": "Built an AI-powered agent using LangGraph and LangSmith to help transform criminal justice data analysis. The agent automates complex data processing workflows for a non-profit working to reduce incarceration through technology and data transparency."
+    },
+    "reflector": {
+      "description": "Led development of a 100% local ML meeting transcription and analysis platform, implementing audio diarization pipelines and speaker merge tooling."
+    },
+    "virtuePoker": {
+      "description": "Core contributor to decentralized crypto poker platform backend, developing game logic, wallet integrations, and processing 161+ merged pull requests."
+    },
+    "sidoc": {
+      "description": "Enterprise resource management system with SIESA ERP integration and real-time async task processing via Celery."
+    },
+    "tunotaria": {
+      "description": "Multi-tenant notary platform serving multiple organizations with SOAP integrations and secure payment processing."
+    },
+    "buuson": {
+      "description": "Full-stack platform with microservices architecture using Tornado, AWS cloud infrastructure, and PayU payment integration."
+    },
+    "redAprende": {
+      "company": "Ministry of Education",
+      "description": "Educational platform for Colombia's Ministry of Education and Universidad del Valle, enabling digital learning resources."
+    },
+    "fillweight": {
+      "description": "Logistics management platform with real-time data processing and Vue.js frontend for operational efficiency."
+    }
+  },
+
+  "github": {
+    "sectionTitle": "GitHub Activity",
+    "sectionDescription": "My open source contributions and public repositories, fetched live from GitHub.",
+    "loading": "Loading GitHub data...",
+    "error": "Unable to load GitHub data.",
+    "errorLink": "Visit my profile →",
+    "retry": "Retry",
+    "totalRepos": "Total Repos",
+    "contributions": "Contributions",
+    "yearsOnGithub": "Years on GitHub",
+    "thisYear": "this year",
+    "recent": "recent",
+    "noRepos": "No repositories to display.",
+    "noDescription": "No description provided",
+    "showAll": "Show All",
+    "showLess": "Show Less",
+    "less": "Less",
+    "more": "More",
+    "contributionsYear": "contributions in the last year",
+    "contributionNote": "Add a GitHub token to see your real contribution graph",
+    "contribution": "contribution",
+    "contributions_plural": "contributions"
+  },
+
+  "education": {
+    "sectionTitle": "Education",
+    "systemsEngineer": "Systems Engineer",
+    "systemsTechnologist": "Information Systems Technologist"
+  },
+
+  "contact": {
+    "sectionTitle": "Get In Touch",
+    "text": "I'm currently open to new opportunities as a Senior Full Stack Developer. Whether you have a question or just want to say hi, feel free to reach out!",
+    "sayHello": "Say Hello 👋"
+  },
+
+  "footer": {
+    "credit": "Designed & Built by Kevin Cardona",
+    "copyright": "All rights reserved."
+  }
+}
